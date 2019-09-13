@@ -1,0 +1,51 @@
+[
+    {
+        "Name": "Name",
+		"NameDisplayedInMibPage": "Name",
+        "Type": "string",
+		"IsRequired" : true,
+        "Id": "form_gvp_channelmaps_templatemib_default_formcomponent_NAME",
+        "DataFieldType": "Varchar"
+    },
+	{
+        "Name": "TVTechnology",
+		"NameDisplayedInMibPage": "TV Technology",
+        "Type": "int",
+		"IsRequired" : true,
+        "Id": "Visible_form_gvp_channelmaps_templatemib_default_formcomponent_TV_TECHNOLOGY_ID",
+        "DataFieldType": "Related"
+    },
+	{
+        "Name": "Region",
+		"NameDisplayedInMibPage": "Region",
+        "Type": "int",
+		"IsRequired" : true,
+        "Id": "Visible_form_gvp_channelmaps_templatemib_default_formcomponent_REGION_ID",
+        "DataFieldType": "Related"
+    },
+	{
+        "Name": "Source",
+		"NameDisplayedInMibPage": "Source",
+        "Type": "int",
+		"IsRequired" : true,
+        "Id": "form_gvp_channelmaps_templatemib_default_formcomponent_SOURCE",
+        "DataFieldType": "Source"
+    },
+	{
+        "Name": "Owmer",
+		"NameDisplayedInMibPage": "Owner",
+        "Type": "int",
+		"IsRequired" : false,
+        "Id": "form_gvp_channelmaps_templatemib_default_formcomponent_OWNER",
+        "DataFieldType": "Integer"
+    },
+	{
+        "Name": "Title",
+		"NameDisplayedInMibPage": "Title",
+        "Type": "string",
+		"IsRequired" : false,
+        "Id": "form_gvp_channelmaps_templatemib_default_formcomponent_TITLE",
+        "DataFieldType": "Varchar"
+    },
+
+]

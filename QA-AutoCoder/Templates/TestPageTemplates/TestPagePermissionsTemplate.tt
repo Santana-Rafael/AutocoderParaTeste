@@ -1,0 +1,39 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter name="ClassName" type="System.string" #>
+<#@ parameter name="ReadWriteUsers" type="System.string" #>
+<#@ parameter name="ReadOnlyUsers" type="System.string" #>
+<#@ parameter name="NoReadUsers" type="System.string" #>
+using GVP.QA.MIB3.Execution.Base;
+using NUnit.Framework;
+using MibClient2.TestLibrary.Selenium;
+using GVP.QA.Model;
+using GVP.QA.Core.Jira;
+using GVP.QA.MIB3.Instances.AgeRatings;
+using GVP.QA.Model.Enumerations;
+
+partial class <#= ClassName #>Tests : Mib3BaseExecution
+{
+
+    [Category(TestCategory.Mib3Permissions)]
+    [Test]
+    public void ReadOnly(
+       [ValueSource(typeof(MibBrowserDataSource), MibBrowserDataSource.ALL_BROWSER)] BrowserName browser,
+       [Values(<#=ReadOnlyUsers #>)] MibUserType userType)
+    {
+        ReadOnlyTest(new <#= ClassName #>EditPage(ListPage));
+    }
+
+    [Category(TestCategory.Mib3Permissions)]
+    [Test]
+    public void NoReadAccess(
+        [ValueSource(typeof(MibBrowserDataSource), MibBrowserDataSource.ALL_BROWSER)] BrowserName browser,
+        [Values(<#=NoReadUsers #>)] MibUserType userType)
+    {
+        CheckUserHasNoReadAccess(new <#= ClassName #>EditPage(ListPage));
+    }
+        
+}

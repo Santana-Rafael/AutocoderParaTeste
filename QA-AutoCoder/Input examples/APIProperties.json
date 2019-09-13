@@ -1,0 +1,27 @@
+[
+    {
+        "ColumnName": "NAME",
+		"PropertieType": "string"
+    },
+	{
+        "ColumnName": "TV_TECHNOLOGY_ID",
+		"PropertieType": "int"
+    },
+	{
+        "ColumnName": "REGION_ID",
+		"PropertieType": "int"
+    },
+	{
+        "ColumnName": "SOURCE",
+		"PropertieType": "int"
+    },
+	{
+        "ColumnName": "OWNER",
+		"PropertieType": "int"
+    },
+	{
+        "ColumnName": "TITLE",
+		"PropertieType": "string"
+    },
+	
+]

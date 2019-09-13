@@ -1,0 +1,60 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter name="ClassName" type="System.string" #>
+<#@ parameter name="ComponentKey" type="System.string" #>
+<#@ parameter name="MenuName" type="System.string" #>
+<#@ parameter name="Properties" type="System.Collections.Generic.List<RunTimeTemplate.Models.EditPagePropertiesModel>" #>
+using GVP.QA.MIB3.Base;
+using MIB.QA.Model;
+using GVP.QA.Tools;
+using MibSelenium.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+public partial class <#= ClassName #>EditPage : Mib3BaseEditPage
+{
+    
+    public <#=ClassName #>EditPage() : base("<#= ComponentKey #>", "<#= MenuName #>")
+    {
+        
+    }
+
+    public <#=ClassName #>EditPage(Mib3BaseListPage page) : base(page,"<#= ComponentKey #>", "<#= MenuName #>")
+    {
+        
+    }
+
+    <#  foreach(var propriedade in Properties)
+        {
+        var propertieType = propriedade.Type.ToLower();
+        
+
+        switch (propertieType){
+        
+            case "string":
+                WriteLine(propriedade.ToString());
+                break;
+            case "int":
+                WriteLine(propriedade.ToInt());
+                break; 
+            case "bool":
+                WriteLine(propriedade.ToBoolean());
+                break;
+            case "datetime":
+                WriteLine(propriedade.ToDateTime());
+                break;
+            default:
+                WriteLine(propriedade.ToEnum());
+                break;
+        }
+
+        }  
+#>
+
+}

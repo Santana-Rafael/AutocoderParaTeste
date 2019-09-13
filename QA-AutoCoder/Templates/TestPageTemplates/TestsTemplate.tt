@@ -1,0 +1,174 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter name="ClassName" type="System.string" #>
+<#@ parameter name="EditMethod" type="System.string" #>
+<#@ parameter name="AssertMethod" type="System.string" #>
+<#@ parameter name="ColumnsNames" type="System.string" #>
+<#@ parameter name="RequiredFields" type="System.string" #>
+<#@ parameter name="AllBlocksList" type="System.string" #>
+<#@ parameter name="ReadWriteUsers" type="System.string" #>
+<#@ parameter name="ReadOnlyUsers" type="System.string" #>
+<#@ parameter name="NoReadUsers" type="System.string" #>
+<#@ parameter name="UsersThatHasAccessToThePage" type="System.string" #>
+using FluentAssertions;
+using GVP.QA.Core.ConfigReader;
+using GVP.QA.Core.Jira;
+using GVP.QA.MIB3.APIModels;
+using GVP.QA.MIB3.APIModels.Factories;
+using GVP.QA.MIB3.Execution.Base;
+using GVP.QA.MIB3.Live;
+using GVP.QA.Model;
+using MibClient2.TestLibrary.Selenium;
+using NUnit.Framework;
+using System.Collections.Generic;
+
+public partial class <#= ClassName #>Tests : Mib3BaseExecution
+{
+        List<string> _allPagesFields = new List<string>() { <# Write(ColumnsNames); #>};
+
+        private List<RequiredField> _requiredFields = new List<RequiredField>()
+		{
+            <#    Write(RequiredFields); #>
+		};
+
+		private List<string> _allBlocksList = new List<string>() { <# Write(AllBlocksList); #> };
+
+        <#=ClassName #>EditPage _editPage;
+
+        public override void Init()
+        {
+            ListPage = new <#=ClassName#>ListPage();
+        }
+
+
+        [Test]
+        [JiraKey("")]
+        public void OpenEdit([ValueSource(typeof(MibClient2.TestLibrary.Selenium.MibBrowserDataSource), MibBrowserDataSource.ALL_BROWSER)] BrowserName browser,
+            [Values(<#= UsersThatHasAccessToThePage #> )] MibUserType userType)
+        {
+            OpenEditTest<<#=ClassName #>EditPage>(_allPagesFields);
+        }
+
+        
+        [Test]
+        [JiraKey("")]
+        public void OpenList([ValueSource(typeof(MibClient2.TestLibrary.Selenium.MibBrowserDataSource), MibBrowserDataSource.ALL_BROWSER)] BrowserName browser,
+            [Values(<#= UsersThatHasAccessToThePage #>)] MibUserType userType)
+        {
+            OpenListTestCheckingAllButtonsAndColumns();
+        }
+
+        [Test]
+        [JiraKey("")]
+        public void RequiredFields(
+        [ValueSource(typeof(MibBrowserDataSource), MibBrowserDataSource.ALL_BROWSER)] BrowserName browser,
+        [Values(<#= ReadWriteUsers #>)] MibUserType userType)
+        {
+            CheckRequiredFields(new <#=ClassName #>EditPage(ListPage), _requiredFields);
+        }
+        
+		[Test]
+        [JiraKey("")]
+        public void CheckAllBlocks(
+        [ValueSource(typeof(MibBrowserDataSource), MibBrowserDataSource.ALL_BROWSER)] BrowserName browser,
+        [Values(<#= UsersThatHasAccessToThePage #>)] MibUserType userType)
+        {
+			ListPage.NavigateByMenu();
+            ListPage.SelectRowInListPage();
+			_editPage = new <#=ClassName #>EditPage(ListPage);
+            CheckPageBlocks(_allBlocksList, _editPage);
+        }
+
+
+        [Test]
+        [JiraKey("")]
+        public void Edit([ValueSource(typeof(MibBrowserDataSource), MibBrowserDataSource.ALL_BROWSER)] BrowserName browser,
+        [Values(<#= ReadWriteUsers #>)] MibUserType userType)
+        {
+            var apiObject = GetOrCreateThroughAPI();
+            var editedModel = new <#= ClassName #>Factory().InitEdited();
+
+            _editPage = <#=ClassName #>EditPage.InitAndGoToItem<<#=ClassName #>EditPage>(ListPage, apiObject.ApiObject.Id);
+
+            Edit(editedModel);
+            _editPage.Save();
+            AssertFields(editedModel);
+        }
+
+		[Test]
+        [JiraKey("")]
+        public void Delete([ValueSource(typeof(MibBrowserDataSource), MibBrowserDataSource.ALL_BROWSER)] BrowserName browser,
+        [Values(<#= ReadWriteUsers#>)] MibUserType userType)
+        {
+            var apiObject = GetOrCreateThroughAPI();
+
+            _editPage = <#=ClassName #>EditPage.InitAndGoToItem<<#=ClassName #>EditPage>(ListPage, apiObject.ApiObject.Id);
+
+            DeleteAndAssert(_editPage);
+
+            RemoveObjectToBeDelete(apiObject.ApiObject);
+        }
+
+		[Test]
+        [JiraKey("")]
+		public void Create([ValueSource(typeof(MibBrowserDataSource), MibBrowserDataSource.ALL_BROWSER)] BrowserName browser,
+        [Values(<#= ReadWriteUsers#>)] MibUserType userType)
+        {
+			ListPage.NavigateByMenu();
+			ListPage.NewItem();
+
+			_editPage = new <#=ClassName #>EditPage(ListPage);
+			var createModel = new <#= ClassName #>Factory().Init();
+			Edit(createModel);
+			_editPage.Save();
+
+			AssertFields(createModel);
+			_editPage.Delete();
+		}
+
+		[Test]
+        [JiraKey("")]
+		public void BulkEdit([ValueSource(typeof(MibBrowserDataSource), MibBrowserDataSource.ALL_BROWSER)] BrowserName browser,
+        [Values(<#= ReadWriteUsers#>)] MibUserType userType)
+        {
+			ListPage.NavigateByMenu();
+			List<int> ids = ListPage.SelectCheckBoxFromMultipleRandomItems(2);
+			ListPage.ClickOnEdit();
+			_editPage = new <#= ClassName #>EditPage(ListPage);
+
+			var bulkEditModel = new <#= ClassName #>Factory().InitEdited();
+			Edit(bulkEditModel);
+			_editPage.Save();
+
+			AssertMultiple<#= ClassName #>(ids, bulkEditModel);
+		}
+
+		public void AssertMultiple<#= ClassName #>(List<int> idList, <#= ClassName #> Model)
+		{
+			foreach (int id in idList)
+			{
+				_editPage.NavigateById(id);
+				AssertFields(Model);
+			}
+		}
+
+        private void Edit(<#= ClassName #> model)
+        {
+<#= EditMethod #>
+        }
+
+        private void AssertFields(<#= ClassName #> model)
+        {
+<#= AssertMethod #>
+        }
+
+        private ObjectForTest GetOrCreateThroughAPI()
+        {
+            return GetOrCreateObject<<#= ClassName #>, <#= ClassName #>Factory>()[0];
+        }
+
+
+}

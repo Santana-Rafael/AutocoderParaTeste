@@ -1,0 +1,4 @@
+{
+	"ReadOnlyUsers": ["AdministratorsReadOnly", "OBAdministratorReadOnly", "LiveTVReadOnly"],
+	"ReadWriteUsers": ["Administrators", "OBAdministrator"]
+}
